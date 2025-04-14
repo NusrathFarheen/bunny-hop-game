@@ -27,7 +27,7 @@ JavaScript
 # How to Run Locally
 Clone this repository to your local machine:
 
-*git clone https://github.com/yourusername/bunny-hop-game.git*
+*git clone https://github.com/NusrathFarheen/bunny-hop-game.git*
 Open the index.html file in your browser to start playing.
 
 # License
