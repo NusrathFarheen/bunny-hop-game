@@ -1,28 +1,29 @@
-let obstacleInterval;
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 600;
-canvas.height = 400;
-
-// Bunny image
-const bunnyImg = new Image();
-bunnyImg.src = "bunny.png";
-
-// Sound effects
-const jumpSound = new Audio('jump.wav');
-const passSound = new Audio('pass.wav');
-const gameOverSound = new Audio('gameover.wav');
+const BASE_WIDTH = 600;
+const BASE_HEIGHT = 400;
+canvas.width = BASE_WIDTH;
+canvas.height = BASE_HEIGHT;
 
 let isSoundOn = true;
+let gameOver = false;
+let score = 0;
+let highScore = localStorage.getItem("highScore") || 0;
 
-// Toggle sound button logic
+document.getElementById("highScore").innerText = highScore;
 document.getElementById("toggle-sound").addEventListener("click", function () {
     isSoundOn = !isSoundOn;
     this.textContent = isSoundOn ? "🔊 Sound: ON" : "🔇 Sound: OFF";
 });
 
-// Bunny
+const bunnyImg = new Image();
+bunnyImg.src = "bunny.png";
+
+const jumpSound = new Audio("jump.wav");
+const passSound = new Audio("pass.wav");
+const gameOverSound = new Audio("gameover.wav");
+
 const bunny = {
     x: 50,
     y: 300,
@@ -34,7 +35,6 @@ const bunny = {
     isJumping: false
 };
 
-// Obstacles
 let obstacles = [];
 
 function createObstacle() {
@@ -44,23 +44,16 @@ function createObstacle() {
     const speed = 5 + Math.random() * 3;
     obstacles.push({
         x: canvas.width + Math.random() * 200,
-        y: y,
-        width: width,
-        height: height,
-        speed: speed,
+        y,
+        width,
+        height,
+        speed,
         passed: false
     });
 }
 
-let score = 0;
-let highScore = localStorage.getItem("highScore") || 0;
-let gameOver = false;
-
-document.getElementById("highScore").innerText = highScore;
-
-// Handle jump
-document.addEventListener("keydown", function(event) {
-    if ((event.code === "Space" || event.code === "ArrowUp") && !bunny.isJumping && !gameOver) {
+function jump() {
+    if (!bunny.isJumping && !gameOver) {
         bunny.velocityY = bunny.jumpPower;
         bunny.isJumping = true;
         if (isSoundOn) {
@@ -68,15 +61,20 @@ document.addEventListener("keydown", function(event) {
             jumpSound.play();
         }
     }
+}
+
+document.addEventListener("keydown", (e) => {
+    if (["Space", "ArrowUp"].includes(e.code)) jump();
 });
 
-// Game loop
+// Touch support for mobile
+canvas.addEventListener("touchstart", jump);
+
 function updateGame() {
     if (gameOver) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Gravity
     bunny.velocityY += bunny.gravity;
     bunny.y += bunny.velocityY;
 
@@ -85,7 +83,6 @@ function updateGame() {
         bunny.isJumping = false;
     }
 
-    // Obstacles
     for (let i = 0; i < obstacles.length; i++) {
         const obs = obstacles[i];
         obs.x -= obs.speed;
@@ -93,7 +90,6 @@ function updateGame() {
         ctx.fillStyle = "red";
         ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
 
-        // Pass detection
         if (!obs.passed && obs.x + obs.width < bunny.x) {
             score++;
             obs.passed = true;
@@ -128,16 +124,11 @@ function updateGame() {
         }
     }
 
-    // Clean up old obstacles
     obstacles = obstacles.filter(obs => obs.x + obs.width > 0);
-
-    // Draw bunny
     ctx.drawImage(bunnyImg, bunny.x, bunny.y, bunny.width, bunny.height);
-
     requestAnimationFrame(updateGame);
 }
 
-// Create new obstacles
 setInterval(() => {
     if (!gameOver) createObstacle();
 }, 1500);
@@ -146,15 +137,12 @@ function restartGame() {
     bunny.y = 300;
     bunny.velocityY = 0;
     bunny.isJumping = false;
-
     obstacles = [];
     score = 0;
     gameOver = false;
-
     document.getElementById("score").innerText = score;
     document.getElementById("highScore").innerText = highScore;
     document.getElementById("restartBtn").style.display = "none";
-
     updateGame();
 }
 
