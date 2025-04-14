@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bunny Hop Runner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Scoreboard -->
+    <div id="scoreboard">
+        Score: <span id="score">0</span><br>
+        High Score: <span id="highScore">0</span>
+    </div>
+
+    <!-- Sound Toggle -->
+    <button id="toggle-sound">🔊 Sound: ON</button>
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+
+    <!-- Restart Button -->
+    <button id="restartBtn" onclick="restartGame()">Restart Game</button>
+
+    <!-- JS Script -->
+    <script src="game.js"></script>
+</body>
+</html>
